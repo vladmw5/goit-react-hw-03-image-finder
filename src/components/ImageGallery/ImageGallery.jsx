@@ -44,7 +44,6 @@ class ImageGallery extends Component {
 
   onLoadMoreClick = () => {
     this.enableLoader();
-    console.log(this.state.currentPage);
     fetchImages(this.props.keyword, ++this.currentPage)
       .then(this.addMoreData)
       .catch(console.error)
@@ -64,7 +63,7 @@ class ImageGallery extends Component {
   };
 
   handleImageClick = event => {
-    this.setCurrentImage(event.target.src);
+    this.setCurrentImage(event.target.dataset.bigsrc);
     this.toggleModal();
   };
 
@@ -72,6 +71,13 @@ class ImageGallery extends Component {
     if (event.code !== 'Escape') return;
     this.toggleModal();
     this.setCurrentImage(null);
+  };
+
+  onBackdropClicked = event => {
+    if (event.target === event.currentTarget) {
+      this.toggleModal();
+      this.setCurrentImage(null);
+    }
   };
 
   componentDidMount() {
@@ -85,7 +91,6 @@ class ImageGallery extends Component {
     }
     this.enableLoader();
     this.currentPage = 1;
-    console.log(this.state.currentPage);
     fetchImages(this.props.keyword, this.state.currentPage)
       .then(this.updateStateWithData)
       .catch(console.error)
@@ -105,6 +110,7 @@ class ImageGallery extends Component {
               <ImageGalleryItem
                 key={image.id}
                 src={image.webformatURL}
+                big={image.largeImageURL}
                 alt={`${this.props.keyword}`}
                 onImageClick={this.handleImageClick}
               />
@@ -118,7 +124,7 @@ class ImageGallery extends Component {
           <Button loadMore={this.onLoadMoreClick} />
         )}
         {this.state.modalShown && (
-          <Modal onBackdropClick={this.toggleModal}>
+          <Modal onBackdropClick={this.onBackdropClicked}>
             <img src={this.state.currentImage} alt={this.props.keyword} />
           </Modal>
         )}
