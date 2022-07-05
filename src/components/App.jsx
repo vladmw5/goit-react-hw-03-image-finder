@@ -8,19 +8,35 @@ import Searchbar from './Searchbar';
 import ImageGallery from './ImageGallery';
 
 class App extends Component {
-  state = { keyword: '' };
+  state = { keyword: '', currentPage: 1 };
 
   updateStateWithKeyword = k => {
     this.setState({ keyword: k });
   };
+
+  onLoadMoreClick = () => {
+    this.setState(prevState => {
+      return { currentPage: prevState.currentPage + 1 };
+    });
+  };
+
+  onSubmit = () => {
+    this.setState({ currentPage: 1 });
+  };
+
   render() {
     return (
       <div className={s.app}>
         <Searchbar
           keyword={this.state.keyword}
           onInput={this.updateStateWithKeyword}
+          onSubmit={this.onSubmit}
         />
-        <ImageGallery keyword={this.state.keyword} />
+        <ImageGallery
+          keyword={this.state.keyword}
+          onLoadMoreClick={this.onLoadMoreClick}
+          currentPage={this.state.currentPage}
+        />
         <ToastContainer></ToastContainer>
       </div>
     );

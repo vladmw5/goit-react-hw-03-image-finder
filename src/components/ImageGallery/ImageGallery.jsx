@@ -16,10 +16,9 @@ class ImageGallery extends Component {
     currentImage: null,
   };
 
-  currentPage = 1;
-
   static propTypes = {
     keyword: PropTypes.string.isRequired,
+    currentPage: PropTypes.number.isRequired,
   };
 
   enableLoader = () => {
@@ -31,23 +30,15 @@ class ImageGallery extends Component {
   };
 
   updateStateWithData = data => {
-    this.setState({
-      images: [...data],
-    });
-  };
-
-  addMoreData = data => {
-    this.setState(prevState => {
-      return { images: [...prevState.images, ...data] };
-    });
-  };
-
-  onLoadMoreClick = () => {
-    this.enableLoader();
-    fetchImages(this.props.keyword, ++this.currentPage)
-      .then(this.addMoreData)
-      .catch(console.error)
-      .finally(this.disableLoader);
+    if (this.props.currentPage === 1) {
+      this.setState({
+        images: [...data],
+      });
+    } else {
+      this.setState(prevState => {
+        return { images: [...prevState.images, ...data] };
+      });
+    }
   };
 
   toggleModal = () => {
@@ -85,13 +76,14 @@ class ImageGallery extends Component {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    //Ця умова є вірна якщо 1) юзер двічи засабмітив теж самий інпут 2) якщо юзер натиснув loadMore
-    if (prevProps.keyword === this.props.keyword) {
+    if (
+      prevProps.keyword === this.props.keyword &&
+      prevProps.currentPage === this.props.currentPage
+    ) {
       return;
     }
     this.enableLoader();
-    this.currentPage = 1;
-    fetchImages(this.props.keyword, this.state.currentPage)
+    fetchImages(this.props.keyword, this.props.currentPage)
       .then(this.updateStateWithData)
       .catch(console.error)
       .finally(this.disableLoader);
@@ -121,7 +113,7 @@ class ImageGallery extends Component {
         )}
         {this.state.isLoading && <Loader />}
         {this.state.images.length > 0 && (
-          <Button loadMore={this.onLoadMoreClick} />
+          <Button loadMore={this.props.onLoadMoreClick} />
         )}
         {this.state.modalShown && (
           <Modal onBackdropClick={this.onBackdropClicked}>

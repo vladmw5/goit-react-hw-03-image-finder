@@ -10,6 +10,7 @@ class Searchbar extends Component {
 
   static propTypes = {
     onInput: PropTypes.func.isRequired,
+    onSubmit: PropTypes.func.isRequired,
     keyword: PropTypes.string.isRequired,
   };
 
@@ -26,8 +27,10 @@ class Searchbar extends Component {
       toast.error(
         "It seems you've made the same query. That's a forbidden user behavior, thus, please, make a normal query, so I can find some images for you."
       );
+      return;
     }
     this.props.onInput(keyword);
+    this.props.onSubmit();
   };
 
   render() {
